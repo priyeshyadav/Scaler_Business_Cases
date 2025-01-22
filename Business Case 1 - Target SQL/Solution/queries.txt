@@ -1,0 +1,110 @@
+select Column_Name, Data_type
+from `Target.INFORMATION_SCHEMA.COLUMNS`
+where table_name = 'customers';
+
+---------------------------------------------------------------------------
+
+select  
+min(order_purchase_timestamp) as First_Order_Placed_Date,
+max(order_purchase_timestamp) as Recent_Order_Placed_Date,
+date_diff(max(order_purchase_timestamp) , min(order_purchase_timestamp), DAY) as Data_Range_Days
+from `Target.orders`;
+---------------------------------------------------------------------------
+select 
+count( distinct C.customer_state) as State_Count,
+count( distinct C.customer_city) as City_Count
+from `Target.customers` C
+join `Target.orders` O on C.customer_id = O.customer_id;
+
+select 
+C.customer_state, 
+count( distinct C.customer_city) as City_Count
+from `Target.customers` C
+join `Target.orders` O on C.customer_id = O.customer_id
+group by 1 order by 2 desc;
+---------------------------------------------------------------------------
+select tbl1.Order_Year, tbl1.Total_Orders,
+sum(tbl1.Total_Orders) over(order by tbl1.Order_Year ) as Cummulative_Orders
+from (
+select 
+format_timestamp('%Y' , order_purchase_timestamp) as Order_Year, 
+count(*) as Total_Orders
+from `Target.orders`
+group by 1
+order by 1 desc) as tbl1;
+---------------------------------------------------------------------------
+select 
+tbl1.Order_Month, tbl1.Total_Orders, 
+concat(round(ifnull(100*(tbl1.Total_Orders - lag(tbl1.Total_Orders) over(Order by Order_Month asc ))/tbl1.Total_Orders,0),2),'%') as Prev_Montly_Comparision
+from
+(select 
+format_timestamp('%m' , order_purchase_timestamp) as Order_Month, 
+count(*) as Total_Orders,
+from `Target.orders`
+group by 1
+) as tbl1
+order by 1 asc
+---------------------------------------------------------------------------
+select 
+case 
+when extract(HOUR from order_purchase_timestamp) between 0 and 6 then 'Dawn'
+when extract(HOUR from order_purchase_timestamp) between 7 and 12 then 'Mornings'
+when cast(format_timestamp('%H', order_purchase_timestamp) as INT64) between 13 and 18 then 'Afternoon'
+else 'Night'
+end as Time_of_the_Day,
+count(*) as No_Of_Ordes
+from `Target.orders` 
+Group by 1 order by 2 desc limit 1;
+
+
+select 
+case 
+when extract(HOUR from order_purchase_timestamp) between 0 and 6 then 'Dawn'
+when extract(HOUR from order_purchase_timestamp) between 7 and 12 then 'Mornings'
+when cast(format_timestamp('%H', order_purchase_timestamp) as INT64) between 13 and 18 then 'Afternoon'
+else 'Night'
+end as Time_of_the_Day,
+count(*) as No_Of_Ordes
+from `Target.orders` 
+Group by 1 order by 2 desc limit 1;
+
+---------------------------------------------------------------------------
+
+select C.customer_state, extract(MONTH from O.order_purchase_timestamp) as Order_Month, 
+count(*) as Orders
+from `Target.orders` O
+left join `Target.customers` C  on O.customer_id = C.customer_id
+group by 1,2
+order by 1, 2 ASC;
+
+select 
+C.customer_state,
+sum(case when extract(MONTH from O.order_purchase_timestamp) = 1 then 1 else 0 end ) as Jan,
+sum(case when extract(MONTH from O.order_purchase_timestamp) = 2 then 1 else 0 end ) as Feb,
+sum(case when extract(MONTH from O.order_purchase_timestamp) = 3 then 1 else 0 end ) as Mar,
+sum(case when extract(MONTH from O.order_purchase_timestamp) = 4 then 1 else 0 end ) as Apr,
+sum(case when extract(MONTH from O.order_purchase_timestamp) = 5 then 1 else 0 end ) as May,
+sum(case when extract(MONTH from O.order_purchase_timestamp) = 6 then 1 else 0 end ) as Jun,
+sum(case when extract(MONTH from O.order_purchase_timestamp) = 7 then 1 else 0 end ) as Jul,
+sum(case when extract(MONTH from O.order_purchase_timestamp) = 8 then 1 else 0 end ) as Aug,
+sum(case when extract(MONTH from O.order_purchase_timestamp) = 9 then 1 else 0 end ) as Sep,
+sum(case when extract(MONTH from O.order_purchase_timestamp) = 10 then 1 else 0 end ) as Oct,
+sum(case when extract(MONTH from O.order_purchase_timestamp) = 11 then 1 else 0 end ) as Nov,
+sum(case when extract(MONTH from O.order_purchase_timestamp) = 12 then 1 else 0 end ) as Dec
+from `Target.orders` O
+left join `Target.customers` C  on O.customer_id = C.customer_id
+group by 1;
+
+---------------------------------------------------------------------------
+
+
+
+
+
+Actionable Recommendation 
+1) Target should try to increase city center in state where overall city center count is less than 100. 12 State has more than 100 city centers while 15 State has less than 100 city centers. 
+2) Target should try to identify cause of rapid drop in customer order starting from September till December.
+3) Most Suitable time for Ad compaign & new launches seems be between May & August.
+4) Since Orders placed in Dawn period are very few (5.27%), It could be utilized for Production issue fixes & maintenance activities. 
+5) Target should get rid of Customer_Id column in Customer table, With Each new order a New Customer_Id is generated which is tagged to Customer_Unique_id. Because of this the size of customer table will continue to grow parallel to new orders. Unless its fulfilling some other purpose which we have not discovered based on this Case Study.
+
