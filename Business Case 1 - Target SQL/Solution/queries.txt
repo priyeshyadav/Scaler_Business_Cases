@@ -56,18 +56,6 @@ count(*) as No_Of_Ordes
 from `Target.orders` 
 Group by 1 order by 2 desc limit 1;
 
-
-select 
-case 
-when extract(HOUR from order_purchase_timestamp) between 0 and 6 then 'Dawn'
-when extract(HOUR from order_purchase_timestamp) between 7 and 12 then 'Mornings'
-when cast(format_timestamp('%H', order_purchase_timestamp) as INT64) between 13 and 18 then 'Afternoon'
-else 'Night'
-end as Time_of_the_Day,
-count(*) as No_Of_Ordes
-from `Target.orders` 
-Group by 1 order by 2 desc limit 1;
-
 ---------------------------------------------------------------------------
 
 select C.customer_state, extract(MONTH from O.order_purchase_timestamp) as Order_Month, 
@@ -103,6 +91,56 @@ group by 1
 order by 2 DESC;
 ---------------------------------------------------------------------------
 
+select 
+#Year, Cost_of_Orders,
+concat(round(ifnull(100*(Cost_of_Orders - lag(Cost_of_orders) over(order by Year))/lag(Cost_of_orders) over(order by Year),0),2),'%') as percentage_increase
+from 
+(Select extract(YEAR from O.order_purchase_timestamp) as Year, round(sum(P.payment_value),2) as Cost_of_Orders
+from `Target.orders` O 
+join `Target.payments` P on O.order_id = P.order_id
+where
+extract(YEAR from O.order_purchase_timestamp) in (2017, 2018) and
+extract(MONTH from O.order_purchase_timestamp) between 1 and 8
+group by 1 ) as tbl1
+order by Year Desc
+limit 1;
+
+---------------------------------------------------------------------------
+
+select C.customer_state, round(sum(tbl_order.Order_Total),2) as Total_Order_Price, round(avg(tbl_order.Order_Total),2) as Average_Order_Price,
+#count(tbl_order.Order_id) as orders, count(distinct tbl_order.Order_id) as distinct_orders
+from `Target.customers` C join 
+(
+select O.customer_id as customer_id,  O.order_id as Order_id, round(sum(P.payment_value),2) as Order_Total
+from `Target.orders` O 
+join `Target.payments` P on O.order_id = P.order_id
+group by 1,2
+) tbl_order
+on C.customer_id = tbl_order.customer_id
+group by 1 order by 1;
+
+-- We should not use this, Here the commented values do not match -- 
+
+select C.customer_state, round(sum(P.payment_value),2) as Total_Order_Price, round(avg(P.payment_value),2) as Average_Order_Price, 
+#count(P.order_id) as Orders, count ( distinct P.order_id) as Distinct_Orders
+from `Target.customers` C
+join `Target.orders` O on C.customer_id = O.customer_id
+join `Target.payments` P on O.order_id = P.order_id
+group by 1
+order by 1;
+
+---------------------------------------------------------------------------
+
+select C.customer_state, round(sum(tbl_Freight.Freight_by_Order),2) as Total_Freight, round(avg(tbl_Freight.Freight_by_Order),2) as Average_Freigh
+from `Target.customers` C
+join `Target.orders` O on C.customer_id = O.customer_id
+join (
+select order_id, round(sum(freight_value),2) as Freight_by_Order
+from `Target.order_items`
+group by 1 ) as tbl_Freight
+on O.order_id = tbl_Freight.order_id
+group by 1 order by 1
+---------------------------------------------------------------------------
 
 
 ---------------------------------------------------------------------------
@@ -112,5 +150,5 @@ Actionable Recommendation
 3) Most Suitable time for Ad compaign & new launches seems be between May & August.
 4) Since Orders placed in Dawn period are very few (5.27%), It could be utilized for Production issue fixes & maintenance activities. 
 5) Target should get rid of Customer_Id column in Customer table, With Each new order a New Customer_Id is generated which is tagged to Customer_Unique_id. Because of this the size of customer table will continue to grow parallel to new orders. Unless its fulfilling some other purpose which we have not discovered based on this Case Study.
-6)
+6) Target should try to increase customer base in state where customer count is less than 2000, Currenlty 19 State cout of 27 have less than 2000 customers.
 
