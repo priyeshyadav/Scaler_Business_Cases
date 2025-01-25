@@ -39,6 +39,18 @@ count(*) as Total_Orders
 from `Target.orders`
 group by 1
 order by 1 desc) as tbl1;
+
+
+select tbl1.Order_Year_Month, tbl1.Total_Orders,
+sum(tbl1.Total_Orders) over(order by tbl1.Order_Year_Month ) as Cummulative_Orders
+from (
+select 
+format_timestamp('%Y-%m' , order_purchase_timestamp) as Order_Year_Month, 
+count(*) as Total_Orders
+from `Target.orders`
+group by 1
+order by 1 desc) as tbl1;
+
 ---------------------------------------------------------------------------
 02B
 
@@ -220,7 +232,7 @@ group by 1 ),
 CTE_FAST_DEL_RNK as
 (
   select State, Fast_del ,
-  dense_rank() over(order by Fast_del asc) as H_RANK,
+  dense_rank() over(order by Fast_del desc) as H_RANK,
   from CTE_FAST_DEL
 )
 select State from CTE_FAST_DEL_RNK
