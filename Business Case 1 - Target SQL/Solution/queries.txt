@@ -1,8 +1,11 @@
+01A
+
 select Column_Name, Data_type
 from `Target.INFORMATION_SCHEMA.COLUMNS`
 where table_name = 'customers';
 
 ---------------------------------------------------------------------------
+01B
 
 select  
 min(order_purchase_timestamp) as First_Order_Placed_Date,
@@ -10,6 +13,8 @@ max(order_purchase_timestamp) as Recent_Order_Placed_Date,
 date_diff(max(order_purchase_timestamp) , min(order_purchase_timestamp), DAY) as Data_Range_Days
 from `Target.orders`;
 ---------------------------------------------------------------------------
+01C
+
 select 
 count( distinct C.customer_state) as State_Count,
 count( distinct C.customer_city) as City_Count
@@ -23,6 +28,8 @@ from `Target.customers` C
 join `Target.orders` O on C.customer_id = O.customer_id
 group by 1 order by 2 desc;
 ---------------------------------------------------------------------------
+02A
+
 select tbl1.Order_Year, tbl1.Total_Orders,
 sum(tbl1.Total_Orders) over(order by tbl1.Order_Year ) as Cummulative_Orders
 from (
@@ -33,6 +40,8 @@ from `Target.orders`
 group by 1
 order by 1 desc) as tbl1;
 ---------------------------------------------------------------------------
+02B
+
 select 
 tbl1.Order_Month, tbl1.Total_Orders, 
 concat(round(ifnull(100*(tbl1.Total_Orders - lag(tbl1.Total_Orders) over(Order by Order_Month asc ))/tbl1.Total_Orders,0),2),'%') as Prev_Montly_Comparision
@@ -45,6 +54,8 @@ group by 1
 ) as tbl1
 order by 1 asc
 ---------------------------------------------------------------------------
+02C
+
 select 
 case 
 when extract(HOUR from order_purchase_timestamp) between 0 and 6 then 'Dawn'
@@ -57,6 +68,7 @@ from `Target.orders`
 Group by 1 order by 2 desc limit 1;
 
 ---------------------------------------------------------------------------
+03A
 
 select C.customer_state, extract(MONTH from O.order_purchase_timestamp) as Order_Month, 
 count(*) as Orders
@@ -84,12 +96,14 @@ left join `Target.customers` C  on O.customer_id = C.customer_id
 group by 1;
 
 ---------------------------------------------------------------------------
+03B
 
 select customer_state, count(distinct customer_unique_id) Count_Customes 
 from `Target.customers` 
 group by 1 
 order by 2 DESC;
 ---------------------------------------------------------------------------
+04A
 
 select 
 #Year, Cost_of_Orders,
@@ -106,6 +120,7 @@ order by Year Desc
 limit 1;
 
 ---------------------------------------------------------------------------
+04B
 
 select C.customer_state, round(sum(tbl_order.Order_Total),2) as Total_Order_Price, round(avg(tbl_order.Order_Total),2) as Average_Order_Price,
 #count(tbl_order.Order_id) as orders, count(distinct tbl_order.Order_id) as distinct_orders
@@ -130,6 +145,7 @@ group by 1
 order by 1;
 
 ---------------------------------------------------------------------------
+04C 
 
 select C.customer_state, round(sum(tbl_Freight.Freight_by_Order),2) as Total_Freight, round(avg(tbl_Freight.Freight_by_Order),2) as Average_Freigh
 from `Target.customers` C
@@ -141,8 +157,81 @@ group by 1 ) as tbl_Freight
 on O.order_id = tbl_Freight.order_id
 group by 1 order by 1
 ---------------------------------------------------------------------------
+05A
+
+select order_id,
+date_diff(order_delivered_customer_date , order_purchase_timestamp, DAY) as time_to_deliver,
+date_diff(order_delivered_customer_date, order_estimated_delivery_date, DAY) as diff_estimated_delivery
+from `Target.orders` where order_delivered_customer_date is not null
+order by 2 desc, 3;
+
+---------------------------------------------------------------------------
+05B
+
+WITH CTE_State_AVG_FREIGHT as (
+select C.customer_state, round(avg(tbl_Freight.Freight_by_Order),2) as Average_Freigh,
+dense_rank() over(order by avg(tbl_Freight.Freight_by_Order) desc ) as DESC_RNK,
+dense_rank() over(order by avg(tbl_Freight.Freight_by_Order) asc ) as ASC_RNK
+from `Target.customers` C
+join `Target.orders` O on C.customer_id = O.customer_id
+join (
+select order_id, round(sum(freight_value),2) as Freight_by_Order
+from `Target.order_items`
+group by 1 ) as tbl_Freight
+on O.order_id = tbl_Freight.order_id
+group by 1 
+)
+select H.customer_state as Highest_Avg_Freight, L.customer_state as Lowest_Avg_Freight
+from CTE_State_AVG_FREIGHT H
+join CTE_State_AVG_FREIGHT L on H.DESC_RNK = L.ASC_RNK
+where H.DESC_RNK <=5
+order by H.DESC_RNK;
 
 
+---------------------------------------------------------------------------
+05C
+With CTE_AVG_DEV_TIME as 
+( select C.customer_state as State, round(avg(date_diff(O.order_delivered_customer_date, O.order_purchase_timestamp, DAY)),2) as Avg_Del_Time
+from `Target.orders` O
+join `Target.customers` C on O.customer_id = C.customer_id
+where O.order_delivered_customer_date is not null
+group by 1 ),
+CTE_STATE_RNK as
+(
+  select State, Avg_Del_Time ,
+  dense_rank() over(order by Avg_Del_Time Desc) as H_RANK,
+  dense_rank() over(order by Avg_Del_Time ) as L_RANK
+  from CTE_AVG_DEV_TIME
+)
+select H.State as High_Delivery_Time,
+L.State as Low_Delivery_State 
+from CTE_STATE_RNK H join CTE_STATE_RNK L on H.H_Rank = L.L_Rank 
+where H.H_Rank <=5;
+
+---------------------------------------------------------------------------
+05D
+
+With CTE_FAST_DEL as 
+( select C.customer_state as State, round(avg(date_diff(O.order_estimated_delivery_date,O.order_delivered_customer_date, DAY)),2) as Fast_del
+from `Target.orders` O
+join `Target.customers` C on O.customer_id = C.customer_id
+where O.order_delivered_customer_date is not null
+group by 1 ),
+CTE_FAST_DEL_RNK as
+(
+  select State, Fast_del ,
+  dense_rank() over(order by Fast_del asc) as H_RANK,
+  from CTE_FAST_DEL
+)
+select State from CTE_FAST_DEL_RNK
+where H_rank <=5
+order by H_Rank
+;
+
+---------------------------------------------------------------------------
+06A
+---------------------------------------------------------------------------
+06B
 ---------------------------------------------------------------------------
 Actionable Recommendation 
 1) Target should try to increase city center in state where overall city center count is less than 100. 12 State has more than 100 city centers while 15 State has less than 100 city centers. 
@@ -151,4 +240,6 @@ Actionable Recommendation
 4) Since Orders placed in Dawn period are very few (5.27%), It could be utilized for Production issue fixes & maintenance activities. 
 5) Target should get rid of Customer_Id column in Customer table, With Each new order a New Customer_Id is generated which is tagged to Customer_Unique_id. Because of this the size of customer table will continue to grow parallel to new orders. Unless its fulfilling some other purpose which we have not discovered based on this Case Study.
 6) Target should try to increase customer base in state where customer count is less than 2000, Currenlty 19 State cout of 27 have less than 2000 customers.
-
+7) Target should improvise on delivering the orders faster, 63 order out of 96476 were delivered in over 100 days.
+8) Target should improve on providing the estimated delivery date, Only 2754 orders were delivery on estimated delivery date, 
+9) Taregt should improve average delivery time against expected delivery time in 5 states where it is more than 15 days.
