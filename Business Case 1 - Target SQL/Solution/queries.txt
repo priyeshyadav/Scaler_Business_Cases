@@ -242,6 +242,25 @@ order by H_Rank
 
 ---------------------------------------------------------------------------
 06A
+
+WITH CTE_Order_Payment_type_combination as (
+select distinct O.order_id, 
+format_timestamp('%Y-%m',order_purchase_timestamp) as order_purchase,
+P.payment_type
+from `Target.orders` O 
+join `Target.payments` P on O.order_id = P.order_id
+where P.payment_value > 0
+),
+CTE_Date_payment_type_count as (
+  select order_purchase, payment_type, count(*) as No_of_Order
+  from CTE_Order_Payment_type_combination
+  group by 1, 2
+  order by 1, 2
+)
+select payment_type, order_purchase, No_of_Order,
+sum(No_of_Order) over (partition by payment_type order by order_purchase) as month_on_month_Order
+from CTE_Date_payment_type_count
+order by 1, 2
 ---------------------------------------------------------------------------
 06B
 ---------------------------------------------------------------------------
