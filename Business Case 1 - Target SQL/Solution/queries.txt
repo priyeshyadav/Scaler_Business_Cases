@@ -263,11 +263,13 @@ from CTE_Date_payment_type_count
 order by 1, 2
 ---------------------------------------------------------------------------
 06B
-select distinct order_id from 
+select payment_installments, count(distinct order_id) from 
 `Target.payments`
-where payment_type = 'credit_card'
-and payment_installments > 1 and payment_value > 0 
+where 
+payment_type = 'credit_card'
+and 
+payment_installments > 1 and payment_value > 0 
 group by 1
-having count(*) > 1;
+having count(order_id) > 1;
 
 ---------------------------------------------------------------------------
