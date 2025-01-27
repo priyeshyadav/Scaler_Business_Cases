@@ -270,6 +270,6 @@ payment_type = 'credit_card'
 and 
 payment_installments > 1 and payment_value > 0 
 group by 1
-having count(order_id) > 1;
+having count(order_id) >=1;
 
 ---------------------------------------------------------------------------
