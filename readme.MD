@@ -11,7 +11,7 @@
       </tr>
 <tr>
       <td>1</td>
-      <td>SQL</td>
+      <td><a href ="https://github.com/priyeshyadav/Scaler_Business_Cases/tree/main/Business%20Case%201%20-%20Target%20SQL" target="_blank">SQL</a></td>
       <td>Target Corporation</td>
       <td>Completed</td>
       <td>Evaluation Pending</td>
