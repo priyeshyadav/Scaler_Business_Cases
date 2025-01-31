@@ -1,6 +1,6 @@
 <HTML>
 <BODY>
-<P>This Repo contains different case studeies that were solved in Scaler's DSML Program.</P>
+<P>This Repo contains different case studies that are solved in Scaler's DSML Program.</P>
 <table>
 <tr>
       <th>Seq</th>
