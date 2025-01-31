@@ -6,7 +6,7 @@
       <th>Seq</th>
       <th>Skill</th>
       <th>Data Set from </th>
-      <th>Staus</th>
+      <th>Status</th>
       <th>Marks</th>
       </tr>
 <tr>
