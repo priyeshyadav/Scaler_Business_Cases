@@ -14,7 +14,7 @@
       <td><a href ="https://github.com/priyeshyadav/Scaler_Business_Cases/tree/main/Business%20Case%201%20-%20Target%20SQL" target="_blank">SQL</a></td>
       <td>Target Corporation</td>
       <td>Completed</td>
-      <td>Evaluation Pending</td>
+      <td>100%</td>
 </tr>
 <tr>
       <td></td>
