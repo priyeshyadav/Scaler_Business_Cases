@@ -17,6 +17,13 @@
       <td>100%</td>
 </tr>
 <tr>
+      <td>2</td>
+      <td><a href ="" target="_blank">Data Analysis & Visulization</a></td>
+      <td>Netflix</td>
+      <td>In Progress</td>
+      <td>0%</td>
+</tr>
+<tr>
       <td></td>
       <td></td>
       <td></td>
