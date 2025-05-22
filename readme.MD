@@ -11,7 +11,7 @@
       </tr>
 <tr>
       <td>1</td>
-      <td><a href ="https://github.com/priyeshyadav/Scaler_Business_Cases/tree/main/Business%20Case%201%20-%20Target%20SQL" target="_blank">SQL</a></td>
+      <td><a href ="https://github.com/priyeshyadav/Scaler_Business_Cases/tree/main/Business_Case_1-Target%20SQL" target="_blank">SQL</a></td>
       <td>Target Corporation</td>
       <td>Completed</td>
       <td>100%</td>
@@ -25,7 +25,7 @@
 </tr>
 <tr>
       <td>3</td>
-      <td><a href ="https://github.com/priyeshyadav/Scaler_Business_Cases/tree/main/" target="_blank">Descriptive Analytics</td>
+      <td><a href ="https://github.com/priyeshyadav/Scaler_Business_Cases/tree/main/Business_Case_3-%20Aerofit%20-%20Descriptive%20Statistics%20%26%20Probability/Problem%20Statement" target="_blank">Descriptive Analytics</td>
       <td>Aerofit</td>
       <td>In progress</td>
       <td></td>
