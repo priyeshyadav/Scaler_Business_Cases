@@ -25,7 +25,7 @@
 </tr>
 <tr>
       <td>3</td>
-      <td><a href ="https://github.com/priyeshyadav/Scaler_Business_Cases/tree/main/Business_Case_3-%20Aerofit%20-%20Descriptive%20Statistics%20%26%20Probability/Problem%20Statement" target="_blank">Descriptive Analytics</td>
+      <td><a href ="https://github.com/priyeshyadav/Scaler_Business_Cases/tree/main/Business_Case_2-Neflix_Data_Analysis_Visulization" target="_blank">Descriptive Analytics</td>
       <td>Aerofit</td>
       <td>In progress</td>
       <td></td>
