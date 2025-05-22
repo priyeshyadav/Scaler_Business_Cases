@@ -20,8 +20,8 @@
       <td>2</td>
       <td><a href ="https://github.com/priyeshyadav/Scaler_Business_Cases/tree/main/Business_Case_2-Neflix_Data_Analysis_Visulization" target="_blank">Data Analysis & Visulization</a></td>
       <td>Netflix</td>
-      <td>In Progress</td>
-      <td></td>
+      <td>Completed</td>
+      <td>69%</td>
 </tr>
 <tr>
       <td></td>
