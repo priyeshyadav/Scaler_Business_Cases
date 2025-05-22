@@ -24,6 +24,13 @@
       <td>69%</td>
 </tr>
 <tr>
+      <td>3</td>
+      <td><a href ="https://github.com/priyeshyadav/Scaler_Business_Cases/tree/main/" target="_blank">Descriptive Analytics</td>
+      <td>Aerofit</td>
+      <td>In progress</td>
+      <td></td>
+</tr>
+<tr>
       <td></td>
       <td></td>
       <td></td>
