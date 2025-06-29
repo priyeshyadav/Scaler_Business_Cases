@@ -27,8 +27,8 @@
       <td>3</td>
       <td><a href ="https://github.com/priyeshyadav/Scaler_Business_Cases/tree/main/Business_Case_2-Neflix_Data_Analysis_Visulization" target="_blank">Descriptive Analytics</td>
       <td>Aerofit</td>
-      <td>In progress</td>
-      <td></td>
+      <td>Completed</td>
+      <td>80%</td>
 </tr>
 <tr>
       <td></td>
